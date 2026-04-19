@@ -29,11 +29,12 @@ These are integration recipes your agent can set up for you. Run
 | Recipe | Category | Requires | What It Does | Setup Time |
 |--------|----------|----------|-------------|------------|
 | [ngrok-tunnel](../../recipes/ngrok-tunnel.md) | Infra | — | Fixed public URL for MCP + voice ($8/mo) | 10 min |
-| [credential-gateway](../../recipes/credential-gateway.md) | Infra | — | Gmail + Calendar access (ClawVisor or Google OAuth) | 15 min |
+| [credential-gateway](../../recipes/credential-gateway.md) | Infra | — | Gmail + Calendar + Drive / Docs access (ClawVisor or Google OAuth) | 15 min |
 | [voice-to-brain](../../recipes/twilio-voice-brain.md) | Sense | ngrok-tunnel | Phone calls create brain pages via Twilio + OpenAI Realtime | 30 min |
 | [email-to-brain](../../recipes/email-to-brain.md) | Sense | credential-gateway | Gmail messages flow into entity pages via deterministic collector | 20 min |
 | [x-to-brain](../../recipes/x-to-brain.md) | Sense | — | Twitter timeline, mentions, keyword monitoring with deletion detection | 15 min |
 | [calendar-to-brain](../../recipes/calendar-to-brain.md) | Sense | credential-gateway | Google Calendar events become searchable daily brain pages | 20 min |
+| [gdrive-to-brain](../../recipes/gdrive-to-brain.md) | Sense | credential-gateway | Google Docs in a chosen Drive root become stable brain pages | 20 min |
 | [meeting-sync](../../recipes/meeting-sync.md) | Sense | — | Circleback meeting transcripts auto-import with attendee propagation | 15 min |
 
 ### Manual Integration Guides
@@ -102,6 +103,9 @@ stop fighting the LLM. Move the mechanical work to code.
   (deterministic). LLM extracts entities, writes brain updates (judgment).
 - Calendar sync: code pulls events and attendees (deterministic). LLM enriches
   attendee brain pages (judgment).
+- Drive sync: code walks a chosen folder, exports Docs, and materializes stable
+  pages (deterministic). LLM links, summarizes, and updates canonical pages
+  (judgment).
 
 This pattern prevents the "LLM forgot the links" failure mode. Mechanical work
 must be 100% reliable. Judgment work is where LLMs shine.
