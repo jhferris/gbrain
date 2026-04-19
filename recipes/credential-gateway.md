@@ -2,7 +2,7 @@
 id: credential-gateway
 name: Credential Gateway
 version: 0.7.0
-description: Secure access to Gmail, Google Calendar, and other Google services. ClawVisor (recommended) or direct Google OAuth.
+description: Secure access to Gmail, Google Calendar, Google Drive / Docs, and other Google services. ClawVisor (recommended) or direct Google OAuth.
 category: infra
 requires: []
 secrets:
@@ -34,14 +34,14 @@ cost_estimate: "$0 (both options are free)"
 
 # Credential Gateway: Secure Access to Google Services
 
-Gmail, Google Calendar, Google Contacts, and other services require OAuth
-credentials. This recipe sets up secure access that email-to-brain and
-calendar-to-brain depend on.
+Gmail, Google Calendar, Google Drive, Google Docs, Google Contacts, and other services require OAuth
+credentials. This recipe sets up secure access that email-to-brain,
+calendar-to-brain, and gdrive-to-brain depend on.
 
 ## IMPORTANT: Instructions for the Agent
 
 **You are the installer.** Other recipes depend on this one. If the user wants
-email-to-brain or calendar-to-brain, set up credential-gateway FIRST.
+email-to-brain, calendar-to-brain, or gdrive-to-brain, set up credential-gateway FIRST.
 
 **Two options, both free:**
 - **Option A: ClawVisor** — handles OAuth, token refresh, and encryption for you.
@@ -56,11 +56,11 @@ email-to-brain or calendar-to-brain, set up credential-gateway FIRST.
 
 ### Step 1: Choose Your Gateway
 
-Ask the user: "How do you want to connect to Google services (Gmail, Calendar)?
+Ask the user: "How do you want to connect to Google services (Gmail, Calendar, Drive, Docs)?
 
 **Option A: ClawVisor (recommended)**
 ClawVisor handles OAuth, token refresh, and encryption. Set it up once and
-email-to-brain, calendar-to-brain, and any future Google service recipes
+email-to-brain, calendar-to-brain, gdrive-to-brain, and any future Google service recipes
 all use the same credentials. No token management on your end.
 
 **Option B: Google OAuth2 directly**
@@ -75,12 +75,14 @@ Tell the user:
 3. Activate the services you need:
    - **Gmail** (for email-to-brain)
    - **Google Calendar** (for calendar-to-brain)
+   - **Google Drive / Google Docs** (for gdrive-to-brain)
    - **Google Contacts** (for enrichment)
 4. Create a standing task with a broad purpose. CRITICAL: be EXPANSIVE.
 
-   Good purpose: 'Full executive assistant access to Gmail, Calendar, and
-   Contacts including inbox triage, event listing, contact lookup, and
-   historical data access for all connected Google accounts.'
+   Good purpose: 'Full executive assistant access to Gmail, Calendar, Drive,
+   Docs, and Contacts including inbox triage, event listing, folder traversal,
+   document export, contact lookup, and historical data access for all
+   connected Google accounts.'
 
    Bad purpose: 'email triage' — too narrow, blocks legitimate requests.
 
@@ -109,6 +111,8 @@ Tell the user:
    - Scopes: add the ones you need:
      - Gmail: `https://www.googleapis.com/auth/gmail.readonly`
      - Calendar: `https://www.googleapis.com/auth/calendar.readonly`
+     - Drive: `https://www.googleapis.com/auth/drive.readonly`
+     - Docs: `https://www.googleapis.com/auth/documents.readonly`
      - Contacts: `https://www.googleapis.com/auth/contacts.readonly`
    - Test users: add your own email address
 4. Create the OAuth client ID:
@@ -118,6 +122,8 @@ Tell the user:
 6. Enable the APIs you need:
    - Gmail: https://console.cloud.google.com/apis/library/gmail.googleapis.com
    - Calendar: https://console.cloud.google.com/apis/library/calendar-json.googleapis.com
+   - Drive: https://console.cloud.google.com/apis/library/drive.googleapis.com
+   - Docs: https://console.cloud.google.com/apis/library/docs.googleapis.com
    Click **'Enable'** on each one.
 
 Paste the Client ID and Client Secret to me."
@@ -148,8 +154,8 @@ mkdir -p ~/.gbrain/integrations/credential-gateway
 echo '{"ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","event":"setup_complete","source_version":"0.7.0","status":"ok","details":{"type":"CLAWVISOR_OR_GOOGLE"}}' >> ~/.gbrain/integrations/credential-gateway/heartbeat.jsonl
 ```
 
-Tell the user: "Credential gateway is set up. Email-to-brain and calendar-to-brain
-can now access your Google services."
+Tell the user: "Credential gateway is set up. Email-to-brain, calendar-to-brain,
+and gdrive-to-brain can now access your Google services."
 
 ## Tricky Spots
 
@@ -165,9 +171,9 @@ can now access your Google services."
 3. **Google consent screen in "Testing" mode** limits to 100 users and tokens
    expire weekly. For personal use this is fine. For production, publish the app.
 
-4. **Multiple Google accounts.** If you have work + personal Gmail, you need to
-   authorize each one separately in the OAuth flow. ClawVisor handles this
-   automatically.
+4. **Multiple Google accounts.** If you have work + personal Gmail or multiple
+   Drive contexts, you need to authorize each one separately in the OAuth flow.
+   ClawVisor handles this automatically.
 
 ## How to Verify
 
@@ -175,6 +181,7 @@ can now access your Google services."
 2. **Google OAuth:** Tokens exist at `~/.gbrain/google-tokens.json`.
 3. **Gmail access:** Run the email collector — it should pull recent messages.
 4. **Calendar access:** Run the calendar sync — it should pull today's events.
+5. **Drive / Docs access:** Run the gdrive collector — it should list Docs under the chosen root folder.
 
 ## Cost Estimate
 
@@ -185,4 +192,4 @@ can now access your Google services."
 
 ---
 
-*Part of the [GBrain Skillpack](../docs/GBRAIN_SKILLPACK.md). See also: [Email-to-Brain](email-to-brain.md), [Calendar-to-Brain](calendar-to-brain.md)*
+*Part of the [GBrain Skillpack](../docs/GBRAIN_SKILLPACK.md). See also: [Email-to-Brain](email-to-brain.md), [Calendar-to-Brain](calendar-to-brain.md), [GDrive-to-Brain](gdrive-to-brain.md)*

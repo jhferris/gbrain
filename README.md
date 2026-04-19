@@ -258,11 +258,12 @@ GBrain ships integration recipes that your agent sets up for you. Each recipe te
 | Recipe | Requires | What It Does |
 |--------|----------|-------------|
 | [Public Tunnel](recipes/ngrok-tunnel.md) | — | Fixed URL for MCP + voice (ngrok Hobby $8/mo) |
-| [Credential Gateway](recipes/credential-gateway.md) | — | Gmail + Calendar access |
+| [Credential Gateway](recipes/credential-gateway.md) | — | Gmail + Calendar + Drive / Docs access |
 | [Voice-to-Brain](recipes/twilio-voice-brain.md) | ngrok-tunnel | Phone calls to brain pages (Twilio + OpenAI Realtime) |
 | [Email-to-Brain](recipes/email-to-brain.md) | credential-gateway | Gmail to entity pages |
 | [X-to-Brain](recipes/x-to-brain.md) | — | Twitter timeline + mentions + deletions |
 | [Calendar-to-Brain](recipes/calendar-to-brain.md) | credential-gateway | Google Calendar to searchable daily pages |
+| [GDrive-to-Brain](recipes/gdrive-to-brain.md) | credential-gateway | Google Docs in a chosen Drive root become brain pages |
 | [Meeting Sync](recipes/meeting-sync.md) | — | Circleback transcripts to brain pages with attendees |
 
 **Data research recipes** extract structured data from email into tracked brain pages. Built-in recipes for investor updates (MRR, ARR, runway, headcount), expense tracking, and company metrics. Create your own with `gbrain research init`.
