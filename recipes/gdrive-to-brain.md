@@ -246,6 +246,8 @@ Minimum schema contract:
 Provider boundary:
 - The recipe defines what the collector must do, not the exact API client implementation
 - The provider layer only needs two capabilities: `list children for a folder` and `export one Doc to plain text`
+- Folder traversal requires a provider operation that preserves parent-child semantics. Do not implement recursion via a generic full-text search primitive.
+- If the provider exposes both `search` and `list/filter` style operations, use the one that can reliably enumerate the immediate children of a specific folder ID.
 - Whether that provider is implemented via ClawVisor or direct Google OAuth is an implementation choice
 
 ### Step 4: Run First Sync
@@ -307,7 +309,7 @@ Simple and strict. Do not include Sheets, Slides, PDFs, or folders in the final 
 
 ```
 walk(folderId, path):
-  items = drive.list(parent=folderId)
+  items = drive.list_children(folderId)
   for item in items:
     if item.mimeType == 'application/vnd.google-apps.folder':
       walk(item.id, path + '/' + item.name)
@@ -316,6 +318,11 @@ walk(folderId, path):
 ```
 
 The collector should traverse only the configured root and its descendants.
+
+Important contract:
+- `list_children(folderId)` means: enumerate the immediate children of that exact folder
+- This is a hierarchical listing operation, not a keyword search operation
+- If a provider only offers free-text search, that is not sufficient by itself to implement correct folder traversal
 
 ### Incremental Sync
 
@@ -363,10 +370,11 @@ The doc ID suffix prevents collisions when two docs have the same title. Use a d
 ### What the Agent Should Test After Setup
 
 1. **Scope boundary:** Put one Doc inside the chosen root and one outside it. Sync. Verify only the in-scope Doc appears.
-2. **MIME filtering:** Add a Sheet in the root folder. Sync. Verify it is skipped.
-3. **Incremental sync:** Run the collector twice with no changes. Verify unchanged Docs are not re-exported.
-4. **Modified doc:** Edit a synced Google Doc. Re-run sync. Verify only that Doc page updates.
-5. **Rename stability:** Rename a synced Doc. Re-run sync. Verify identity remains tied to doc ID and the old slugged page is removed.
+2. **Subtree enumeration:** Put multiple Docs inside a known subfolder-root. Sync. Verify discovery returns those Docs. This specifically catches implementations that confuse folder traversal with full-text search.
+3. **MIME filtering:** Add a Sheet in the root folder. Sync. Verify it is skipped.
+4. **Incremental sync:** Run the collector twice with no changes. Verify unchanged Docs are not re-exported.
+5. **Modified doc:** Edit a synced Google Doc. Re-run sync. Verify only that Doc page updates.
+6. **Rename stability:** Rename a synced Doc. Re-run sync. Verify identity remains tied to doc ID and the old slugged page is removed.
 
 ## Cost Estimate
 
@@ -385,6 +393,7 @@ The doc ID suffix prevents collisions when two docs have the same title. Use a d
 
 **Only some Docs imported:**
 - Verify recursion is enabled
+- Verify the provider operation used for traversal really lists the direct children of a specific folder
 - Verify unsupported MIME types are being skipped as expected
 - Check whether docs live in a shared drive or location not covered by the current auth scope
 
